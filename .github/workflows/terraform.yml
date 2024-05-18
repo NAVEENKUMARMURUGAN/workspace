@@ -1,0 +1,35 @@
+name: Terraform Provision
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup AWS CLI
+        uses: aws-actions/aws-cli@v2
+        with:
+          aws-version: '2.0.64'
+          region: us-east-1  # Replace with your desired region
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Validate Terraform Configuration
+        run: terraform validate
+
+      - name: Apply Terraform Configuration (Optional Prompt)
+        run: |
+          echo "Are you sure you want to apply Terraform configuration (y/N)?"
+          read answer
+          if [[ "$answer" != "y" ]]; then
+            exit 1
+          fi
+          terraform apply
